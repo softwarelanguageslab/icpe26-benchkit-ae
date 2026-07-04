@@ -2,7 +2,7 @@
  * NUMA-aware CNA (Compact NUMA-Aware) lock wrapper.
  *
  * Paper reference: Section 4.1 - one of the NUMA-aware hierarchical locks
- *                  evaluated in Figures 7 and 14.
+ *                  evaluated in Figures 3 and 6.
  *                  See Dice & Kogan, "Compact NUMA-aware Locks", EuroSys 2019.
  *
  * This header wraps libvsync's cnalock implementation with NUMA-node awareness.
@@ -16,11 +16,11 @@
  * is produced by lib/lockgen/hmcs.py at experiment setup time.
  *
  * This file is compiled by locks/CMakeLists.txt into a shared library that
- * Tilt (libmutrep) can load via LD_PRELOAD.
+ * tilt can load via LD_PRELOAD.
  */
 
-#ifndef PERFAID_NUMA_CNALOCK_H
-#define PERFAID_NUMA_CNALOCK_H
+#ifndef BENCHKIT_NUMA_CNALOCK_H
+#define BENCHKIT_NUMA_CNALOCK_H
 
 #include <vsync/spinlock/cnalock.h>
 
@@ -62,4 +62,4 @@ numa_cnalock_release(numa_cnalock_t *l, cna_node_t *n)
 
     cnalock_release(&l->lock, n, numa_node);
 }
-#endif /* PERFAID_NUMA_CNALOCK_H */
+#endif /* BENCHKIT_NUMA_CNALOCK_H */

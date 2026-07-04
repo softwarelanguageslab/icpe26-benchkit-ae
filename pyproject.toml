@@ -1,7 +1,7 @@
 [project]
-name = "perfaid-artifact"
-version = "0.0.1"
-description = "ICPE'26 artifact for perfaid: A Declarative Framework for Composable Performance Evaluation"
+name = "benchkit-artifact"
+version = "1.0.0"
+description = "ICPE'26 artifact for benchkit: A Declarative Framework for Composable Performance Evaluation"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -27,8 +27,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/open-s4c/benchkit"
-Paper = "https://doi.org/10.1145/XXXXXXX.XXXXXXX"
+Homepage = "https://github.com/softwarelanguageslab/icpe26-benchkit-ae"
+Framework = "https://github.com/open-s4c/benchkit"
+Paper = "https://doi.org/10.1145/3777884.3796997"
 
 [build-system]
 requires = ["hatchling"]

@@ -2,27 +2,27 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 15 Experiment: perfaid framework overhead measurement.
+Figure 7 Experiment: benchkit framework overhead measurement.
 
 Paper reference:
-    Section 5 (Overhead of perfaid), Figure 15.
+    Section 5 (Overhead of benchkit), Figure 7.
 
 What this script does:
-    Measures perfaid's overhead by running LevelDB readrandom on both the
+    Measures benchkit's overhead by running LevelDB readrandom on both the
     native host and inside a Docker container, then comparing throughput
     with equivalent hand-written shell scripts (shell_host.sh, shell_docker.sh).
 
     The script:
-    1. Builds a Docker image (perfaid_overhead) using pythainer
-    2. Runs a benchkit campaign on the host (fig15_leveldb_host)
-    3. Runs a benchkit campaign inside Docker (fig15_leveldb_docker)
+    1. Builds a Docker image (benchkit_overhead) using pythainer
+    2. Runs a benchkit campaign on the host (figure7_leveldb_host)
+    3. Runs a benchkit campaign inside Docker (figure7_leveldb_docker)
     4. Generates a strip plot comparing host vs. Docker throughput
 
     After this script completes, run shell_host.sh and shell_docker.sh to
     produce the shell baseline data, then run plot_overhead.py to generate
-    the final 3-panel comparison figure (Figure 15 in the paper).
+    the final 3-panel comparison figure (Figure 7 in the paper).
 
-    The paper shows that perfaid introduces no measurable overhead (<2.2%)
+    The paper shows that benchkit introduces no measurable overhead (<2.2%)
     compared to equivalent hand-written shell scripts.
 
 Hardware used in the paper:
@@ -40,11 +40,11 @@ Prerequisites:
     - Docker installed and current user in docker group
     - Python environment set up (see README)
 
-How to run (full Figure 15 reproduction):
-    cd experiments/fig15_overhead/
+How to run (full Figure 7 reproduction):
+    cd experiments/figure7_overhead/
 
     # Step 1: Run benchkit campaigns (host + Docker)
-    python fig15_leveldb_overhead.py
+    python figure7_leveldb_overhead.py
 
     # Step 2: Run shell baselines
     ./shell_host.sh
@@ -55,12 +55,14 @@ How to run (full Figure 15 reproduction):
 
 Output:
     - Campaign CSVs in ~/.benchkit/results/
-    - Shell results in ~/.benchkit/results/fig15_shell_{host,docker}/
-    - Final figure: ~/.benchkit/results/fig15_overhead.{pdf,png}
+    - Shell results in ~/.benchkit/results/figure7_shell_{host,docker}/
+    - Final figure: ~/.benchkit/results/figure7_overhead.{pdf,png}
 """
 
+import argparse
 from pathlib import Path
 
+import pandas as pd
 from benchkit import CampaignCartesianProduct
 from benchkit.benches.leveldb import LevelDBBench
 from benchkit.campaign import CampaignSuite
@@ -71,16 +73,17 @@ from pythainer.examples.builders import get_user_builder
 from pythainer.runners import ConcreteDockerRunner
 
 from lib import get_platform
+from lib.plots import load_campaign_df, set_paper_style, stripplot_by_category
 
 # Note: Run this script before shell_host.sh/shell_docker.sh, as it builds the
 # Docker image and clones the LevelDB repository that the shell scripts reuse.
 # See the README for pythainer documentation.
 
 
-# Experiment configuration
-NB_RUNS = 10
-DURATION_S = 10
-THREADS = [2, 4, 8]
+# ---- User-tunable defaults (paper values) ----
+DEFAULT_NB_RUNS = 10
+DEFAULT_DURATION_S = 10
+DEFAULT_THREADS = [2, 4, 8]
 
 
 def _get_os_version() -> str:
@@ -96,7 +99,7 @@ def _get_os_version() -> str:
 
 def _get_docker_platform() -> Platform:
     """Create a Docker platform for container experiments."""
-    image_name = "perfaid_overhead"
+    image_name = "benchkit_overhead"
     work_dir = "/home/user/workspace"
     docker_path = Path(work_dir)
     repo_dir = gitmainrootdir().resolve()
@@ -135,58 +138,122 @@ def _get_campaign(
     name: str,
     run_type: str,
     platform: Platform,
+    nb_runs: int,
+    threads: list[int],
+    duration_s: int,
 ):
     """Create a LevelDB campaign for the given platform."""
     return CampaignCartesianProduct(
         name=name,
         benchmark=LevelDBBench(),
-        nb_runs=NB_RUNS,
+        nb_runs=nb_runs,
         variables={
             "bench_name": ["readrandom"],
-            "nb_threads": THREADS,
+            "nb_threads": threads,
         },
         constants={
             "run_type": run_type,
         },
-        duration_s=DURATION_S,
+        duration_s=duration_s,
         platform=platform,
     )
 
 
-def main() -> None:
+def _int_list(text: str) -> list[int]:
+    """Parse a comma-separated list of ints, e.g. '2,4,8'."""
+    return [int(x) for x in text.split(",") if x.strip()]
+
+
+def run(
+    *,
+    nb_runs: int = DEFAULT_NB_RUNS,
+    duration_s: int = DEFAULT_DURATION_S,
+    threads: list[int] | None = None,
+    paper_fonts: bool = False,
+) -> None:
+    if threads is None:
+        threads = DEFAULT_THREADS
+
     host_platform = get_platform()
     docker_platform = _get_docker_platform()
 
-    suite = CampaignSuite(
-        campaigns=[
-            _get_campaign(
-                name="fig15_leveldb_docker",
-                run_type="benchkit_docker",
-                platform=docker_platform,
-            ),
-            _get_campaign(
-                name="fig15_leveldb_host",
-                run_type="benchkit_host",
-                platform=host_platform,
-            ),
-        ]
-    )
+    campaigns = [
+        _get_campaign(
+            name="figure7_leveldb_docker",
+            run_type="benchkit_docker",
+            platform=docker_platform,
+            nb_runs=nb_runs,
+            threads=threads,
+            duration_s=duration_s,
+        ),
+        _get_campaign(
+            name="figure7_leveldb_host",
+            run_type="benchkit_host",
+            platform=host_platform,
+            nb_runs=nb_runs,
+            threads=threads,
+            duration_s=duration_s,
+        ),
+    ]
+    suite = CampaignSuite(campaigns=campaigns)
 
     suite.print_durations()
     suite.run_suite()
 
-    suite.generate_graph(
-        plot_name="stripplot",
-        x="nb_threads",
+    # Paper-styled host-vs-Docker strip plot (Figure 7, benchkit panels; the full
+    # figure with the shell baselines is assembled by plot_overhead.py)
+    set_paper_style(use_latex=paper_fonts)
+    df = pd.concat([load_campaign_df(c) for c in campaigns], ignore_index=True)
+    results_dir = Path.home() / ".benchkit" / "results"
+    stripplot_by_category(
+        df,
+        x="run_type",
         y="throughput",
-        hue="run_type",
-        title="benchkit throughput comparison between Docker container and host",
+        facet_col="nb_threads",
+        ylabel="Throughput (ops/sec)",
+        out_path=results_dir / "figure7_overhead.pdf",
     )
 
     print("\nResults saved to: ~/.benchkit/results/")
     print("\nTo compare with shell scripts, run:")
     print("  ./shell_host.sh")
     print("  ./shell_docker.sh")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Figure 7: benchkit framework overhead (host vs Docker).",
+    )
+    parser.add_argument(
+        "--nb-runs",
+        type=int,
+        default=DEFAULT_NB_RUNS,
+        help=f"Repetitions per thread count (default: {DEFAULT_NB_RUNS}, paper value).",
+    )
+    parser.add_argument(
+        "--duration-s",
+        type=int,
+        default=DEFAULT_DURATION_S,
+        help=f"Duration in seconds per run (default: {DEFAULT_DURATION_S}, paper value).",
+    )
+    parser.add_argument(
+        "--threads",
+        type=_int_list,
+        default=None,
+        help="Comma-separated thread counts (default: 2,4,8).",
+    )
+    parser.add_argument(
+        "--paper-fonts",
+        action="store_true",
+        help="Use LaTeX fonts for exact paper typography (requires a LaTeX install).",
+    )
+    args = parser.parse_args()
+    run(
+        nb_runs=args.nb_runs,
+        duration_s=args.duration_s,
+        threads=args.threads,
+        paper_fonts=args.paper_fonts,
+    )
 
 
 if __name__ == "__main__":

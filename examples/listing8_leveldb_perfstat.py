@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 11: perfaid campaign with perf stat integration.
+Listing 8: benchkit campaign with perf stat integration.
 
 Paper reference:
-    Section 4.3 (Using perf for Profiling and Run-Time Statistics), Figure 11.
+    Section 4.3 (Using perf for Profiling and Run-Time Statistics), Listing 8.
 
 What this script does:
     Demonstrates how to combine scheduling policies with hardware performance
@@ -31,7 +31,7 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig11_leveldb_perfstat.py
+    python listing8_leveldb_perfstat.py
 
 Output:
     - CSV results and bar-plots (PNG/PDF) in ~/.benchkit/results/
@@ -69,7 +69,7 @@ def main() -> None:
     )
 
     campaign = CampaignCartesianProduct(
-        name="fig11_leveldb_perfstat",
+        name="listing8_leveldb_perfstat",
         benchmark=LevelDBBench(),
         variables={
             "nb_threads": [24],

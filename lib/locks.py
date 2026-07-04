@@ -1,24 +1,24 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Lock library configuration and Tilt (libmutrep) shared-library generation.
+Lock library configuration and tilt shared-library generation.
 
 Paper reference:
-    Section 4.1 (Studying Locking Impact with perfaid).
+    Section 4.1 (Studying Locking Impact).
 
 This module manages the full pipeline for lock interposition experiments:
 
 1. **Lock selection** - defines the set of available lock algorithms and their
    human-readable names for plot legends (LOCKS, PRETTY_LOCKS).
 
-2. **Code generation** - for each selected lock, generates a Tilt-compatible C
+2. **Code generation** - for each selected lock, generates a tilt-compatible C
    wrapper that bridges the lock's native API to the pthread_mutex interface
-   intercepted by Tilt via LD_PRELOAD. NUMA-aware HMCS locks are additionally
+   intercepted by tilt via LD_PRELOAD. NUMA-aware HMCS locks are additionally
    generated with platform-specific hierarchy parameters (number of NUMA nodes,
    cache partitions, etc.).
 
-3. **Library build** - compiles all wrappers into a single shared library
-   (``libmutrep.so``) that can be injected into any benchmark.
+3. **Library build** - compiles the wrappers into tilt shared libraries
+   (one ``.so`` per lock) that can be injected into any benchmark.
 
 Supported lock algorithms:
     Flat locks (from libvsync, ``deps/libvsync/``):
@@ -155,7 +155,7 @@ def get_tilt_lib(
     debug: bool = False,
 ) -> TiltLib:
     """
-    Build and return the Tilt shared library for lock interposition.
+    Build and return the tilt shared library for lock interposition.
 
     This generates platform-specific lock implementations (including NUMA-aware
     HMCS locks) and compiles them into a shared library that can be injected

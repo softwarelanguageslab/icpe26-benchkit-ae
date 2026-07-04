@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 7 Experiment: Lock throughput across KyotoCabinet, LevelDB, RocksDB.
+Figure 3 Experiment: Lock throughput across KyotoCabinet, LevelDB, RocksDB.
 
 Paper reference:
-    Section 4.1 (Studying Locking Impact with perfaid), Figure 7.
+    Section 4.1 (Studying Locking Impact), Figure 3.
 
 What this script does:
     Runs a comprehensive lock sweep across three key-value store benchmarks
@@ -17,7 +17,7 @@ What this script does:
     sweep from 1 to 96 (filtered to available CPUs). Each configuration is
     repeated 3 times for 10 seconds.
 
-    The Tilt shared library is built automatically and injected via LD_PRELOAD.
+    The tilt shared library is built automatically and injected via LD_PRELOAD.
 
 Hardware used in the paper:
     Platform B - NUMA server (2x Kunpeng 920-4826, 96 cores across 4 NUMA
@@ -28,8 +28,10 @@ Hardware used in the paper:
     high thread counts) may differ on non-NUMA or small-core-count machines.
 
 Expected execution time:
-    ~96 minutes on the paper's 96-core server (with duration=5, nb_runs=2).
-    Measured: real 95m39s. Scales with core count and number of locks.
+    Defaults reproduce the paper parameters (nb_runs=3, duration_s=10). A reduced
+    run (--nb-runs 2 --duration-s 5) took ~96 minutes (real 95m39s) on the paper's
+    96-core server; the default paper parameters take roughly 3x longer. Scales
+    with core count and number of locks.
 
 Prerequisites:
     - System packages: build-essential, cmake, libsnappy-dev, libgflags-dev,
@@ -38,12 +40,15 @@ Prerequisites:
 
 How to run:
     cd experiments/
-    python fig07_locks.py
+    python figure3_locks.py
 
 Output:
     - CSV results per panel and line-plots (PNG/PDF) in ~/.benchkit/results/
     - One line plot per panel: throughput vs. threads, one line per lock
 """
+
+import argparse
+from pathlib import Path
 
 from benchkit import CampaignCartesianProduct
 from benchkit.benches.kyotocabinet import KyotoCabinetBench
@@ -52,30 +57,43 @@ from benchkit.benches.rocksdb import RocksDBBench
 from benchkit.campaign import CampaignSuite
 
 from lib import LOCKS, PRETTY_LOCKS, Panel, get_platform, get_tilt_lib
+from lib.plots import combine_panel_dfs, lineplot_by_bench, set_paper_style
 
-# Experiment configuration (values used for plot generation in submission)
-THREADS = [1, 2, 4, 8, 16, 24, 32, 64, 72, 80, 88, 96]
-# NB_RUNS = 3
-# DURATION_S = 10
-
-# Parameters reduced for practical concerns:
-NB_RUNS = 2
-DURATION_S = 5
+# ---- User-tunable defaults (paper values) ----
+# Defaults reproduce the paper plots (nb_runs=3, duration_s=10). For a quicker
+# run, reduce them on the command line, e.g. --nb-runs 2 --duration-s 5.
+DEFAULT_THREADS = [1, 2, 4, 8, 16, 24, 32, 64, 72, 80, 88, 96]
+DEFAULT_NB_RUNS = 3
+DEFAULT_DURATION_S = 10
 
 
-def main() -> None:
+def _int_list(text: str) -> list[int]:
+    """Parse a comma-separated list of ints, e.g. '1,2,4,8'."""
+    return [int(x) for x in text.split(",") if x.strip()]
+
+
+def run(
+    *,
+    nb_runs: int = DEFAULT_NB_RUNS,
+    duration_s: int = DEFAULT_DURATION_S,
+    threads: list[int] | None = None,
+    paper_fonts: bool = False,
+) -> None:
+    if threads is None:
+        threads = DEFAULT_THREADS
+
     platform = get_platform()
     tiltlib = get_tilt_lib(platform=platform)
 
     # Filter thread counts to available CPUs
     max_cpus = platform.nb_cpus()
-    threads = [t for t in THREADS if t <= max_cpus]
+    threads = [t for t in threads if t <= max_cpus]
 
     # Define the panels (one per benchmark/workload)
     panels = [
         Panel(
             name="kyotocabinet",
-            campaign_name="fig07_kyotocabinet",
+            campaign_name="figure3_kyotocabinet",
             bench=KyotoCabinetBench(),
             parameter_space={
                 "nb_threads": threads,
@@ -84,7 +102,7 @@ def main() -> None:
         ),
         Panel(
             name="leveldb/readrandom",
-            campaign_name="fig07_leveldb_readrandom",
+            campaign_name="figure3_leveldb_readrandom",
             bench=LevelDBBench(),
             parameter_space={
                 "nb_threads": threads,
@@ -94,7 +112,7 @@ def main() -> None:
         ),
         Panel(
             name="leveldb/seekrandom",
-            campaign_name="fig07_leveldb_seekrandom",
+            campaign_name="figure3_leveldb_seekrandom",
             bench=LevelDBBench(),
             parameter_space={
                 "nb_threads": threads,
@@ -104,7 +122,7 @@ def main() -> None:
         ),
         Panel(
             name="rocksdb/readrandom",
-            campaign_name="fig07_rocksdb_readrandom",
+            campaign_name="figure3_rocksdb_readrandom",
             bench=RocksDBBench(),
             parameter_space={
                 "nb_threads": threads,
@@ -114,7 +132,7 @@ def main() -> None:
         ),
         Panel(
             name="rocksdb/seekrandom",
-            campaign_name="fig07_rocksdb_seekrandom",
+            campaign_name="figure3_rocksdb_seekrandom",
             bench=RocksDBBench(),
             parameter_space={
                 "nb_threads": threads,
@@ -132,8 +150,8 @@ def main() -> None:
             shared_libs=[tiltlib],
             variables=p.parameter_space,
             pretty={"lock": PRETTY_LOCKS},
-            nb_runs=NB_RUNS,
-            duration_s=DURATION_S,
+            nb_runs=nb_runs,
+            duration_s=duration_s,
             platform=platform,
         )
         for p in panels
@@ -144,17 +162,55 @@ def main() -> None:
     suite.print_durations()
     suite.run_suite()
 
-    # Generate individual graphs for each panel
-    for panel, campaign in zip(panels, campaigns):
-        campaign.generate_graph(
-            plot_name="lineplot",
-            x="nb_threads",
-            y="throughput",
-            hue="lock",
-            title=f"Lock throughput - {panel.name}",
-        )
+    # Generate the paper-styled 5-panel figure (Figure 3)
+    set_paper_style(use_latex=paper_fonts)
+    df = combine_panel_dfs(zip(panels, campaigns))
+    df["Lock"] = df["lock"].map(PRETTY_LOCKS)
+    results_dir = Path.home() / ".benchkit" / "results"
+    lineplot_by_bench(
+        df,
+        hue="Lock",
+        legend_ncol=len(LOCKS),
+        out_path=results_dir / "figure3_locks.pdf",
+    )
 
     print("\nResults saved to: ~/.benchkit/results/")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Figure 3: lock throughput sweep across KyotoCabinet, LevelDB, RocksDB.",
+    )
+    parser.add_argument(
+        "--nb-runs",
+        type=int,
+        default=DEFAULT_NB_RUNS,
+        help=f"Repetitions per configuration (default: {DEFAULT_NB_RUNS}, paper value).",
+    )
+    parser.add_argument(
+        "--duration-s",
+        type=int,
+        default=DEFAULT_DURATION_S,
+        help=f"Duration in seconds per run (default: {DEFAULT_DURATION_S}, paper value).",
+    )
+    parser.add_argument(
+        "--threads",
+        type=_int_list,
+        default=None,
+        help="Comma-separated thread counts (default: 1,2,4,8,16,24,32,64,72,80,88,96).",
+    )
+    parser.add_argument(
+        "--paper-fonts",
+        action="store_true",
+        help="Use LaTeX fonts for exact paper typography (requires a LaTeX install).",
+    )
+    args = parser.parse_args()
+    run(
+        nb_runs=args.nb_runs,
+        duration_s=args.duration_s,
+        threads=args.threads,
+        paper_fonts=args.paper_fonts,
+    )
 
 
 if __name__ == "__main__":

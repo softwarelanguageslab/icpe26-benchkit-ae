@@ -2,37 +2,37 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Plot Figure 15: perfaid overhead comparison.
+Plot Figure 7: benchkit overhead comparison.
 
 Paper reference:
-    Section 5 (Overhead of perfaid), Figure 15.
+    Section 5 (Overhead of benchkit), Figure 7.
 
 What this script does:
     Collects results from four sources and produces the final comparison figure:
-      1. benchkit host campaign (CSV in ~/.benchkit/results/...fig15...host...)
-      2. benchkit Docker campaign (CSV in ~/.benchkit/results/...fig15...docker...)
-      3. Shell host runs (text files in ~/.benchkit/results/fig15_shell_host/)
-      4. Shell Docker runs (text files in ~/.benchkit/results/fig15_shell_docker/)
+      1. benchkit host campaign (CSV in ~/.benchkit/results/...figure7...host...)
+      2. benchkit Docker campaign (CSV in ~/.benchkit/results/...figure7...docker...)
+      3. Shell host runs (text files in ~/.benchkit/results/figure7_shell_host/)
+      4. Shell Docker runs (text files in ~/.benchkit/results/figure7_shell_docker/)
 
     Produces a 3-panel strip plot (one per thread count: 2, 4, 8) comparing
-    perfaid vs. shell throughput, faceted by execution environment.
+    benchkit vs. shell throughput, faceted by execution environment.
 
     Also prints an overhead summary table showing the percentage difference
-    between perfaid and shell for each thread count and environment.
+    between benchkit and shell for each thread count and environment.
 
 Prerequisites:
     Run these three scripts first (in order):
-      1. python fig15_leveldb_overhead.py   (benchkit campaigns)
+      1. python figure7_leveldb_overhead.py   (benchkit campaigns)
       2. ./shell_host.sh                     (shell baseline on host)
       3. ./shell_docker.sh                   (shell baseline in Docker)
 
 How to run:
-    cd experiments/fig15_overhead/
+    cd experiments/figure7_overhead/
     python plot_overhead.py
 
 Output:
-    - ~/.benchkit/results/fig15_overhead.pdf
-    - ~/.benchkit/results/fig15_overhead.png
+    - ~/.benchkit/results/figure7_overhead.pdf
+    - ~/.benchkit/results/figure7_overhead.png
     - Overhead summary table printed to console
 """
 
@@ -53,7 +53,7 @@ def _collect_benchkit_csvs() -> pd.DataFrame:
     Find the last benchkit campaign CSV for host and docker, parse with get_dataframe,
     and return a unified DataFrame with columns: run_type, nb_threads, throughput.
     """
-    csv_files = sorted(RESULTS_DIR.glob("benchmark_*fig15*.csv"))
+    csv_files = sorted(RESULTS_DIR.glob("benchmark_*figure7*.csv"))
 
     # Keep the last CSV per category (sorted by name includes timestamp)
     last_per_type: dict[str, Path] = {}
@@ -125,8 +125,8 @@ def main():
     # --- Collect all data ---
     dfs = [
         _collect_benchkit_csvs(),
-        _collect_shell_results("fig15_shell_host", "shell_host"),
-        _collect_shell_results("fig15_shell_docker", "shell_docker"),
+        _collect_shell_results("figure7_shell_host", "shell_host"),
+        _collect_shell_results("figure7_shell_docker", "shell_docker"),
     ]
     df = pd.concat([d for d in dfs if not d.empty], ignore_index=True)
 
@@ -140,8 +140,8 @@ def main():
     # --- Pretty labels + ordering ---
     run_type_order = ["benchkit_host", "benchkit_docker", "shell_host", "shell_docker"]
     run_type_pretty = {
-        "benchkit_host": "perfaid host",
-        "benchkit_docker": "perfaid docker",
+        "benchkit_host": "benchkit host",
+        "benchkit_docker": "benchkit docker",
         "shell_host": "Shell host",
         "shell_docker": "Shell docker",
     }
@@ -159,7 +159,6 @@ def main():
         rc={
             "figure.figsize": (8, 6),
             "pdf.fonttype": 42,
-            "pdf.use14corefonts": True,
         },
     )
 
@@ -188,8 +187,8 @@ def main():
     plt.tight_layout()
 
     # --- Save ---
-    out_pdf = RESULTS_DIR / "fig15_overhead.pdf"
-    out_png = RESULTS_DIR / "fig15_overhead.png"
+    out_pdf = RESULTS_DIR / "figure7_overhead.pdf"
+    out_png = RESULTS_DIR / "figure7_overhead.png"
     g.savefig(str(out_pdf))
     g.savefig(str(out_png), dpi=150)
     print(f"Saved: {out_pdf}")

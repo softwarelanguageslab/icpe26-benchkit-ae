@@ -2,15 +2,15 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 6: perfaid campaign for LevelDB with different lock implementations.
+Listing 5: benchkit campaign for LevelDB with different lock implementations.
 
 Paper reference:
-    Section 4.1 (Studying Locking Impact with perfaid), Figure 6.
+    Section 4.1 (Studying Locking Impact), Listing 5.
 
 What this script does:
     Demonstrates how to use shared libraries (via LD_PRELOAD) to inject
     different lock implementations into a benchmark without modifying its
-    source code. The Tilt library (libmutrep) interposes pthread mutex
+    source code. The tilt library interposes pthread mutex
     calls and replaces them with the selected spinlock algorithm.
 
     Lock algorithms tested: CAS, TTAS, Ticket, MCS, Hemlock, CNA, HMCS,
@@ -28,11 +28,11 @@ Expected execution time:
 Prerequisites:
     - System packages: build-essential, cmake, libsnappy-dev
     - Python environment set up (see README)
-    - The Tilt shared library is built automatically by the script
+    - The tilt shared library is built automatically by the script
 
 How to run:
     cd examples/
-    python fig06_leveldb_locks.py
+    python listing5_leveldb_locks.py
 
 Output:
     - CSV results and a line-plot (PNG/PDF) in ~/.benchkit/results/
@@ -50,7 +50,7 @@ def main() -> None:
     tiltlib = get_tilt_lib(platform=platform)
 
     campaign = CampaignCartesianProduct(
-        name="fig06_leveldb_locks",
+        name="listing5_leveldb_locks",
         benchmark=LevelDBBench(),
         shared_libs=[tiltlib],
         variables={

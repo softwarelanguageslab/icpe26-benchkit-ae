@@ -1,6 +1,6 @@
 # generatedlocks/CMakeLists.txt
 #
-# Build configuration for auto-generated Tilt lock wrappers.
+# Build configuration for auto-generated tilt lock wrappers.
 #
 # The C source files in src/ are generated at experiment setup time by
 # lib/lockgen/tiltgen.py (for libvsync locks: CAS, TTAS, Ticket, MCS,
@@ -8,12 +8,12 @@
 # The generated header for HMCS is placed in include/.
 #
 # This CMakeLists.txt compiles each generated .c file into an individual
-# shared library (.so), which Tilt (libmutrep) combines and loads via
+# shared library (.so), which tilt combines and loads via
 # LD_PRELOAD to interpose pthread_mutex calls with the selected lock.
 #
 # Dependencies:
 #   - deps/libvsync/    (atomic primitives and spinlock implementations)
-#   - deps/tilt/        (Tilt interposition header)
+#   - deps/tilt/        (tilt interposition header)
 #
 # ARM-specific: On aarch64, LSE atomics are enabled (-march=armv8-a+lse).
 

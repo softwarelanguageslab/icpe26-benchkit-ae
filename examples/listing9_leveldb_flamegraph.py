@@ -2,14 +2,14 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 13: perfaid campaign using perf record to generate flame graphs.
+Listing 9: benchkit campaign using perf record to generate flame graphs.
 
 Paper reference:
-    Section 4.4 (Visualizing Performance with Flame Graphs in perfaid), Figure 13.
+    Section 4.4 (Visualizing Performance with Flame Graphs in benchkit), Listing 9.
 
 What this script does:
     Demonstrates how to generate flame graphs and differential flame graphs
-    using the PerfReportWrap command wrapper. The wrapper prepends
+    using the PerfRecordWrap command wrapper. The wrapper prepends
     `perf record` to the benchmark invocation; a post-run hook converts
     the resulting perf.data into a folded stack trace and then into an SVG
     flame graph (using Brendan Gregg's FlameGraph tools, fetched automatically).
@@ -34,7 +34,7 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig13_leveldb_flamegraph.py
+    python listing9_leveldb_flamegraph.py
 
 Output:
     - Per-run flame graphs (flamegraph.svg) in per-run directories
@@ -45,7 +45,7 @@ Output:
 
 from benchkit import CampaignCartesianProduct
 from benchkit.benches.leveldb import LevelDBBench
-from benchkit.commandwrappers.perf import PerfReportWrap, enable_non_sudo_perf
+from benchkit.commandwrappers.perf import PerfRecordWrap, enable_non_sudo_perf
 from benchkit.utils.dir import get_tools_dir
 
 from lib import (
@@ -73,7 +73,7 @@ def main() -> None:
 
     # Configure perf record with FlameGraph tools
     flamegraph_dir = get_tools_dir(None) / "FlameGraph"
-    perf_record = PerfReportWrap(
+    perf_record = PerfRecordWrap(
         freq=99,
         report_interactive=False,
         report_file=True,
@@ -84,7 +84,7 @@ def main() -> None:
     perf_record.fetch_flamegraph()
 
     campaign = CampaignCartesianProduct(
-        name="fig13_leveldb_flamegraph",
+        name="listing9_leveldb_flamegraph",
         benchmark=LevelDBBench(),
         shared_libs=[tiltlib],
         variables={

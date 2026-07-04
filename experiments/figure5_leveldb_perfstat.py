@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 12 Experiment: perf-stat analysis for LevelDB with schedulers.
+Figure 5 Experiment: perf-stat analysis for LevelDB with schedulers.
 
 Paper reference:
-    Section 4.3 (Using perf for Profiling and Run-Time Statistics), Figure 12.
+    Section 4.3 (Using perf for Profiling and Run-Time Statistics), Figure 5.
 
 What this script does:
     Runs LevelDB readrandom at 24 threads under six scheduling policies while
@@ -32,26 +32,35 @@ Prerequisites:
 
 How to run:
     cd experiments/
-    python fig12_leveldb_perfstat.py
+    python figure5_leveldb_perfstat.py
 
 Output:
     - CSV results and bar-plots (PNG/PDF) in ~/.benchkit/results/
     - Five bar plots: throughput + four perf-stat metrics, one bar per scheduler
 """
 
+import argparse
+
 from benchkit import CampaignCartesianProduct
 from benchkit.benches.leveldb import LevelDBBench
 from benchkit.commandwrappers.perf import PerfStatWrap, enable_non_sudo_perf
 
 from lib import PRETTY_SCHEDULERS, SCHEDULERS, get_platform, get_scheduler
+from lib.plots import load_campaign_df, perfstat_barplot, set_paper_style
 
-# Experiment configuration
-NB_THREADS = 24
-NB_RUNS = 3
-DURATION_S = 30
+# ---- User-tunable defaults (paper values) ----
+DEFAULT_NB_THREADS = 24
+DEFAULT_NB_RUNS = 3
+DEFAULT_DURATION_S = 30
 
 
-def main() -> None:
+def run(
+    *,
+    nb_threads: int = DEFAULT_NB_THREADS,
+    nb_runs: int = DEFAULT_NB_RUNS,
+    duration_s: int = DEFAULT_DURATION_S,
+    paper_fonts: bool = False,
+) -> None:
     platform = get_platform()
 
     # Enable perf without sudo (best-effort)
@@ -73,16 +82,16 @@ def main() -> None:
     )
 
     campaign = CampaignCartesianProduct(
-        name="fig12_leveldb_perfstat",
+        name="figure5_leveldb_perfstat",
         benchmark=LevelDBBench(),
         variables={
-            "nb_threads": [NB_THREADS],
+            "nb_threads": [nb_threads],
             "bench_name": ["readrandom"],
             "scheduler": SCHEDULERS,
         },
         pretty={"scheduler": PRETTY_SCHEDULERS},
-        nb_runs=NB_RUNS,
-        duration_s=DURATION_S,
+        nb_runs=nb_runs,
+        duration_s=duration_s,
         command_wrappers=[perf_stat],
         pre_run_hooks=[schedkit.start_sched_hook],
         post_run_hooks=[
@@ -94,25 +103,54 @@ def main() -> None:
 
     campaign.run()
 
-    # Generate all 5 panels
-    metrics = [
-        ("throughput", "Throughput"),
-        ("perf-stat/context-switches", "Context Switches"),
-        ("perf-stat/cpu-migrations", "CPU Migrations"),
-        ("perf-stat/page-faults", "Page Faults"),
-        ("perf-stat/cache-misses", "Cache Misses"),
-    ]
-
-    for metric, title in metrics:
-        campaign.generate_graph(
-            plot_name="barplot",
-            x="scheduler",
-            y=metric,
-            hue="scheduler",
-            title=title,
-        )
+    # Paper-styled per-metric bar grid (Figure 5): throughput + perf-stat counters.
+    # Use the short raw scheduler names (Normal/FAR/CLOSE/AsymSched/SAM/SAS) as in the
+    # paper -- the long PRETTY_SCHEDULERS labels overflow this dense multi-panel grid.
+    set_paper_style(use_latex=paper_fonts)
+    df = load_campaign_df(campaign)
+    perfstat_barplot(
+        df,
+        group_col="scheduler",
+        out_path=campaign.base_data_dir() / "figure5_leveldb_perfstat.pdf",
+    )
 
     print("\nResults saved to: ~/.benchkit/results/")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Figure 5: perf-stat analysis for LevelDB across schedulers.",
+    )
+    parser.add_argument(
+        "--nb-threads",
+        type=int,
+        default=DEFAULT_NB_THREADS,
+        help=f"Number of benchmark threads (default: {DEFAULT_NB_THREADS}).",
+    )
+    parser.add_argument(
+        "--nb-runs",
+        type=int,
+        default=DEFAULT_NB_RUNS,
+        help=f"Repetitions per scheduler (default: {DEFAULT_NB_RUNS}).",
+    )
+    parser.add_argument(
+        "--duration-s",
+        type=int,
+        default=DEFAULT_DURATION_S,
+        help=f"Duration in seconds per run (default: {DEFAULT_DURATION_S}).",
+    )
+    parser.add_argument(
+        "--paper-fonts",
+        action="store_true",
+        help="Use LaTeX fonts for exact paper typography (requires a LaTeX install).",
+    )
+    args = parser.parse_args()
+    run(
+        nb_threads=args.nb_threads,
+        nb_runs=args.nb_runs,
+        duration_s=args.duration_s,
+        paper_fonts=args.paper_fonts,
+    )
 
 
 if __name__ == "__main__":

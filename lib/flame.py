@@ -4,10 +4,10 @@
 Flame graph generation utilities.
 
 Paper reference:
-    Section 4.4 (Visualizing Performance with Flame Graphs in perfaid),
-    Figures 13 and 14.
+    Section 4.4 (Visualizing Performance with Flame Graphs in benchkit),
+    Listing 9 and Figure 6.
 
-This module provides two helpers that wrap benchkit's PerfReportWrap
+This module provides two helpers that wrap benchkit's PerfRecordWrap
 functionality with artifact-specific defaults (title generation, sizing):
 
     flame_post_hook()
@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Optional
 
 from benchkit.benchmark import RecordResult, WriteRecordFileFunction
-from benchkit.commandwrappers.perf import PerfReportWrap
+from benchkit.commandwrappers.perf import PerfRecordWrap
 from benchkit.utils.types import PathType
 
 # Default flame graph styling
@@ -41,7 +41,7 @@ FLAMEGRAPH_MINWIDTH = 2.0
 
 
 def flame_post_hook(
-    perf_record: PerfReportWrap,
+    perf_record: PerfRecordWrap,
     flamegraph_width: int = FLAMEGRAPH_WIDTH,
     flamegraph_height: int = FLAMEGRAPH_HEIGHT,
     flamegraph_fontsize: int = FLAMEGRAPH_FONTSIZE,
@@ -54,7 +54,7 @@ def flame_post_hook(
     count, scheduler, etc.) to generate descriptive flame graph titles.
 
     Args:
-        perf_record: The PerfReportWrap instance used to record the run.
+        perf_record: The PerfRecordWrap instance used to record the run.
         flamegraph_width: Width of the flame graph in pixels.
         flamegraph_height: Height per stack frame in pixels.
         flamegraph_fontsize: Font size for labels.
@@ -108,7 +108,7 @@ def flame_post_hook(
 
 
 def generate_differential_flamegraph(
-    perf_record: PerfReportWrap,
+    perf_record: PerfRecordWrap,
     src_folded_path: Path,
     dst_folded_path: Path,
     out_svg_path: Path,
@@ -127,7 +127,7 @@ def generate_differential_flamegraph(
     profile, blue indicates functions that take less time.
 
     Args:
-        perf_record: The PerfReportWrap instance (provides flamegraph tools path).
+        perf_record: The PerfRecordWrap instance (provides flamegraph tools path).
         src_folded_path: Path to the source (baseline) folded stack file.
         dst_folded_path: Path to the destination (comparison) folded stack file.
         out_svg_path: Path where the differential SVG will be written.

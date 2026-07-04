@@ -2,19 +2,19 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 8: PreRun and PostRun Hooks for UserPlace (schedkit).
+Listing 6: Pre-run and post-run hooks for schedkit.
 
 Paper reference:
-    Section 4.2 (Studying Thread-Placement Impact with perfaid), Figure 8.
+    Section 4.2 (Studying Thread-Placement Impact), Listing 6.
 
 What this script does:
     Demonstrates the hook mechanism used to integrate external scheduling
-    daemons with perfaid campaigns. The pre-run hook starts the UserPlace
-    (schedkit) daemon before each benchmark run with the policy specified
+    daemons with benchkit campaigns. The pre-run hook starts the schedkit
+    daemon before each benchmark run with the policy specified
     in the campaign parameters; the post-run hook terminates it afterward.
 
     This script is illustrative only - it prints the configured hooks but
-    does not run a full campaign. See fig09_leveldb_schedulers.py for a
+    does not run a full campaign. See listing7_leveldb_schedulers.py for a
     complete example that uses these hooks in an actual campaign.
 
 Hardware used in the paper:
@@ -29,7 +29,7 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig08_sched_hooks.py
+    python listing6_sched_hooks.py
 
 Output:
     - Console output showing the configured hook functions
@@ -64,7 +64,7 @@ def main() -> None:
     print("Scheduler hooks configured successfully.")
     print(f"  start_sched_hook: {schedkit.start_sched_hook}")
     print(f"  end_sched_hook: {schedkit.end_sched_hook}")
-    print("\nSee fig09_sched_campaign.py for a complete example.")
+    print("\nSee listing7_leveldb_schedulers.py for a complete example.")
 
 
 if __name__ == "__main__":
