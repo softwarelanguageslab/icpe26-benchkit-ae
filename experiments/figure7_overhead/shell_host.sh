@@ -2,26 +2,26 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-# Figure 15: Shell-based overhead measurement (host execution)
+# Figure 7: Shell-based overhead measurement (host execution)
 #
-# Paper reference: Section 5 (Overhead of perfaid), Figure 15.
+# Paper reference: Section 5 (Overhead of benchkit), Figure 7.
 #
-# This script is the hand-written shell equivalent of the perfaid campaign,
+# This script is the hand-written shell equivalent of the benchkit campaign,
 # used to measure framework overhead. It performs exactly the same steps as
-# the benchkit campaign in fig15_leveldb_overhead.py but using plain shell:
+# the benchkit campaign in figure7_leveldb_overhead.py but using plain shell:
 #   1. Builds db_bench from the LevelDB source (reuses benchkit's cached clone)
 #   2. Runs fillseq once to initialize the database
 #   3. Runs readrandom for threads in {2, 4, 8}, 10 repetitions each
-#   4. Saves raw output to ~/.benchkit/results/fig15_shell_host/
+#   4. Saves raw output to ~/.benchkit/results/figure7_shell_host/
 #
 # Prerequisites:
-#   - Run fig15_leveldb_overhead.py first (it clones LevelDB into ~/.benchkit/benches/)
+#   - Run figure7_leveldb_overhead.py first (it clones LevelDB into ~/.benchkit/benches/)
 #   - System packages: build-essential, cmake, libsnappy-dev
 #
 # Expected execution time: ~5 minutes (3 thread counts x 10 runs x 10 s)
 #
 # How to run:
-#   cd experiments/fig15_overhead/
+#   cd experiments/figure7_overhead/
 #   ./shell_host.sh
 #
 # After running, use plot_overhead.py to generate the comparison figure.
@@ -42,7 +42,7 @@ BUILD_DIR="$LEVELDB_SRC/build-shellhost"
 DB_DIR="$BUILD_DIR/tmp/shell_leveldb_db"
 
 # Output directory
-OUT_DIR="$BENCHKIT_HOME_HOST/results/fig15_shell_host"
+OUT_DIR="$BENCHKIT_HOME_HOST/results/figure7_shell_host"
 
 mkdir -p "$BUILD_DIR" "$DB_DIR" "$OUT_DIR"
 

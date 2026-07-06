@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Lock code generation package for Tilt (libmutrep) interposition.
+Lock code generation package for tilt interposition.
 
-This package generates Tilt-compatible C source files that bridge spinlock
+This package generates tilt-compatible C source files that bridge spinlock
 implementations (from libvsync and custom headers) to the pthread_mutex API
-intercepted by the Tilt shared library via LD_PRELOAD.
+intercepted by the tilt shared library via LD_PRELOAD.
 
 Modules:
     tiltgen     Generates C wrappers for libvsync spinlocks (CAS, TTAS, Ticket,

@@ -2,13 +2,13 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 1: Example perfaid campaign for LevelDB.
+Listing 1: Example benchkit campaign for LevelDB.
 
 Paper reference:
-    Section 2.3 (Example), Figure 1.
+    Section 2.3 (Example), Listing 1.
 
 What this script does:
-    Demonstrates the basic structure of a perfaid campaign:
+    Demonstrates the basic structure of a benchkit campaign:
     - Define a benchmark (LevelDBBench, see `deps/benchkit/benchkit/benches/leveldb/__init__.py`)
     - Define a parameter space (bench_name x nb_threads)
     - Create a campaign that explores all combinations (cartesian product)
@@ -31,7 +31,7 @@ Prerequisites:
 
 How to run (with venv enabled):
     cd examples/
-    python fig01_leveldb.py
+    python listing1_leveldb.py
 
 Output:
     - CSV results and a line-plot (PNG/PDF) in ~/.benchkit/results/
@@ -51,7 +51,7 @@ def main() -> None:
 
     # Create a campaign that runs all combinations
     campaign = CampaignCartesianProduct(
-        name="fig01_leveldb",
+        name="listing1_leveldb",
         benchmark=LevelDBBench(),
         variables=parameter_space,
         nb_runs=3,

@@ -1,44 +1,30 @@
-# Artifact: **perfaid**
+# Artifact: **benchkit**
 
 This artifact accompanies the ICPE 2026 paper:
 
-> **perfaid: A Declarative Framework for Composable Performance Evaluation of System Software**
+> **benchkit: A Declarative Framework for Composable Performance Evaluation of System Software**
 
 It provides all scripts, configurations, and instructions required to
 **reproduce the experimental results** presented in the paper and to
 **inspect the underlying data and artifacts** produced during execution.
 
----
-
-## Important note on naming (anonymization vs. public release)
-
-During the ICPE review process, the paper used **codenames** for some software
-components in order to preserve reviewer anonymity.
-These components are already **publicly available open-source projects** and
-will be referenced exclusively by their public names in the camera-ready version.
-
-For clarity, this artifact may use **both names interchangeably**.
-
-| Submission codename | Public name  | Repository                                                                   |
-| ------------------- | ------------ | ---------------------------------------------------------------------------- |
-| `perfaid`           | **benchkit** | [https://github.com/open-s4c/benchkit](https://github.com/open-s4c/benchkit) |
-| `libmutrep`         | **tilt**     | [https://github.com/open-s4c/tilt](https://github.com/open-s4c/tilt)         |
-| `UserPlace`         | **schedkit** | [https://github.com/open-s4c/schedkit](https://github.com/open-s4c/schedkit) |
-
-> After camera-ready submission, all remaining codename references will be
-> removed and only public names will remain.
+> **Looking for benchkit itself?** This repository is the *artifact* accompanying the
+> paper; the scripts and data needed to reproduce its results. For documentation on the
+> **benchkit framework** (installation, API, and general usage beyond this paper), refer to
+> the framework repository (<https://github.com/open-s4c/benchkit>) or the paper itself
+> (DOI [10.1145/3777884.3796997](https://doi.org/10.1145/3777884.3796997)).
 
 ---
 
 ## What this artifact demonstrates
 
-**perfaid / benchkit** is a Python framework for **systematic, composable
+**benchkit** is a Python framework for **systematic, composable
 performance experimentation**.  Rather than focusing on a single benchmark or
 workload, the artifact demonstrates how experiments can be *assembled declaratively*
 from reusable components:
 
 * benchmarks (LevelDB, RocksDB, KyotoCabinet, SPEC CPU 2017, microbenchmarks)
-* locking mechanisms (Tilt, wrapping spinlock implementations like CAS, MCS, CNA, HMCS, etc.)
+* locking mechanisms (tilt, wrapping spinlock implementations like CAS, MCS, CNA, HMCS, etc.)
 * scheduling policies (schedkit, implementing CLOSE, FAR, SAS, SAM, etc.)
 * profiling tools (`perf stat`, `perf record`, flame graphs)
 * execution environments (host, Docker)
@@ -54,7 +40,7 @@ The artifact contains **three main case studies** from the paper:
    large NUMA system to study scalability and interaction effects.
 
 3. **Framework overhead analysis** (Section 5)
-   Quantifying the runtime overhead introduced by the perfaid/benchkit framework,
+   Quantifying the runtime overhead introduced by the benchkit framework,
    comparing native shell-based execution with framework-managed execution,
    both on the host and inside containers.
 
@@ -69,47 +55,47 @@ artifact/
 ├── requirements.txt          # Python dependencies
 │
 ├── examples/                 # Runnable code examples (paper listings)
-│   ├── fig01_leveldb.py              # Figure 1:  Basic LevelDB campaign
-│   ├── fig02_spec.py                 # Figure 2:  SPEC baseline variability
-│   ├── fig03_heater.py               # Figure 3:  Sequential heater sweep
-│   ├── fig04_leveldb_placement.py    # Figure 4:  TasksetWrap (LevelDB)
-│   ├── fig04_spec_placement.py       # Figure 4:  TasksetWrap (SPEC CPU)
-│   ├── fig06_leveldb_locks.py        # Figure 6:  Lock campaign with Tilt
-│   ├── fig08_sched_hooks.py          # Figure 8:  Scheduler hook demo
-│   ├── fig09_leveldb_schedulers.py   # Figure 9:  Scheduler campaign with schedkit
-│   ├── fig11_leveldb_perfstat.py     # Figure 11: perf-stat integration
-│   └── fig13_leveldb_flamegraph.py   # Figure 13: Flame graph generation
+│   ├── listing1_leveldb.py            # Listing 1: Basic LevelDB campaign
+│   ├── listing2_spec.py               # Listing 2: SPEC baseline variability
+│   ├── listing3_heater.py             # Listing 3: Sequential heater sweep
+│   ├── listing4_spec_placement.py     # Listing 4: TasksetWrap (SPEC CPU)
+│   ├── listing4_leveldb_placement.py  # Listing 4: TasksetWrap (LevelDB variant)
+│   ├── listing5_leveldb_locks.py      # Listing 5: Lock campaign with tilt
+│   ├── listing6_sched_hooks.py        # Listing 6: Scheduler hook demo
+│   ├── listing7_leveldb_schedulers.py # Listing 7: Scheduler campaign with schedkit
+│   ├── listing8_leveldb_perfstat.py   # Listing 8: perf-stat integration
+│   └── listing9_leveldb_flamegraph.py # Listing 9: Flame graph generation
 │
 ├── experiments/              # Full experiments producing paper figures
-│   ├── fig05_heater.py               # Figure 5 (right): Per-CPU heater
-│   ├── fig05_placement_spec.py       # Figure 5 (left):  Placement (SPEC)
-│   ├── fig05_placement_leveldb.py    # Figure 5 (left):  Placement (LevelDB, alternative)
-│   ├── fig07_locks.py                # Figure 7:  Lock sweep (5 panels)
-│   ├── fig10_schedulers.py           # Figure 10: Scheduler sweep (5 panels)
-│   ├── fig12_leveldb_perfstat.py     # Figure 12: perf-stat + schedulers
-│   ├── fig14_leveldb_flamegraph.py   # Figure 14: Differential flame graphs
-│   └── fig15_overhead/               # Figure 15: Framework overhead
-│       ├── fig15_leveldb_overhead.py #   benchkit campaigns (host + Docker)
+│   ├── figure2_heater.py              # Figure 2 (right): Per-CPU heater
+│   ├── figure2_placement_spec.py      # Figure 2 (left):  Placement (SPEC)
+│   ├── figure2_placement_leveldb.py   # Figure 2 (left):  Placement (LevelDB, alternative)
+│   ├── figure3_locks.py               # Figure 3: Lock sweep (5 panels)
+│   ├── figure4_schedulers.py          # Figure 4: Scheduler sweep (5 panels)
+│   ├── figure5_leveldb_perfstat.py    # Figure 5: perf-stat + schedulers (5 panels)
+│   ├── figure6_leveldb_flamegraph.py  # Figure 6: Differential flame graphs
+│   └── figure7_overhead/              # Figure 7: Framework overhead
+│       ├── figure7_leveldb_overhead.py #  benchkit campaigns (host + Docker)
 │       ├── shell_host.sh             #   shell baseline (host)
 │       ├── shell_docker.sh           #   shell baseline (Docker)
 │       └── plot_overhead.py          #   final comparison figure
 │
 ├── lib/                      # Shared helpers (installed via pip -e .)
 │   ├── __init__.py
-│   ├── locks.py              # Lock configuration and Tilt integration
+│   ├── locks.py              # Lock configuration and tilt integration
 │   ├── schedulers.py         # Scheduler hooks (schedkit integration)
 │   ├── panels.py             # Panel dataclass for multi-panel figures
 │   ├── platforms.py          # Platform detection
 │   ├── flame.py              # Flame graph utilities
-│   └── lockgen/              # Lock code generation for Tilt
+│   └── lockgen/              # Lock code generation for tilt
 │
 ├── locks/                    # Custom lock implementations (CNA)
 ├── generatedlocks/           # Generated locks (HMCS)
 │
 └── deps/                     # External dependencies (git submodules)
     ├── benchkit/             # Core framework
-    ├── schedkit/             # User-space scheduler (UserPlace)
-    ├── tilt/                 # Lock interposition library (libmutrep)
+    ├── schedkit/             # User-space scheduler
+    ├── tilt/                 # Lock interposition library
     ├── libvsync/             # Spinlock implementations
     └── pythainer/            # Docker image builders
 ```
@@ -142,27 +128,27 @@ NUMA placement, or Linux scheduling behavior.
 
 The experiments were run on two representative platforms:
 
-### Platform A: Hybrid-Core Laptop (Sections 3, 5 — Figures 5)
-- **CPU**: AMD Ryzen AI 9 HX 370 (8 P-cores + 16 E-cores, 24 total)
+### Platform A: Hybrid-Core Laptop (Section 3 — Figure 2)
+- **CPU**: AMD Ryzen AI 9 HX 370 (4 P-cores + 8 E-cores, 12 cores / 24 threads)
 - **RAM**: 32 GiB
 - **OS**: Manjaro 26.0.1 with Linux 6.18+
 - **Use case**: Hybrid-core variability study
 
-### Platform B: Large NUMA Server (Section 4 — Figures 7, 10, 12, 14)
+### Platform B: Large NUMA Server (Section 4 — Figures 3, 4, 5, 6)
 - **CPU**: 2x Kunpeng 920-4826 (96 cores across 4 NUMA nodes)
 - **RAM**: 539 GiB
 - **Architecture**: aarch64
 - **OS**: Ubuntu 20.04.6 LTS, kernel 5.4.0-200-generic
 - **Use case**: Lock/scheduler studies on many-core ARM
 
-The **overhead study** (Section 5, Figure 15) was conducted on a third platform
+The **overhead study** (Section 5, Figure 7) was conducted on a third platform
 (Intel Core i7-13800H, Ubuntu 22.04.5) but can be **replicated on any Linux
 machine with Docker installed**. The specific hardware is not important for this
 experiment, as it measures the relative overhead of the framework compared to
 hand-written shell scripts on the same machine.
 
 Results may differ on other hardware. The experiments are designed to demonstrate
-perfaid's capabilities; absolute performance numbers are platform-specific.
+benchkit's capabilities; absolute performance numbers are platform-specific.
 
 > The artifact **does not require identical hardware** to run.
 > Absolute performance numbers will differ, but **qualitative trends**
@@ -195,7 +181,6 @@ sudo apt install -y \
     linux-tools-common \
     linux-tools-$(uname -r) \
     numactl \
-    stress-ng \
     fuseiso \
     libbz2-dev \
     libgflags-dev \
@@ -230,10 +215,10 @@ sudo sysctl -w kernel.perf_event_paranoid=-1
 | Tool | Purpose | Installation |
 |------|---------|--------------|
 | [perf](https://perf.wiki.kernel.org/) | Performance profiling | Included in `linux-tools-*` |
-| [Docker](https://www.docker.com/) | Container experiments (Figure 15 only) | See below |
+| [Docker](https://www.docker.com/) | Container experiments (Figure 7 only) | See below |
 
 
-#### Docker Installation (required only for Figure 15)
+#### Docker Installation (required only for Figure 7)
 
 We recommend installing Docker using the official convenience script rather than Ubuntu packages:
 
@@ -249,8 +234,8 @@ sudo usermod -aG docker $USER
 | Component | Repository | Purpose |
 |-----------|------------|---------|
 | **benchkit** | [open-s4c/benchkit](https://github.com/open-s4c/benchkit) | Core framework |
-| **tilt** | [open-s4c/tilt](https://github.com/open-s4c/tilt) | Lock interposition (libmutrep) |
-| **schedkit** | [open-s4c/schedkit](https://github.com/open-s4c/schedkit) | User-space scheduler (UserPlace) |
+| **tilt** | [open-s4c/tilt](https://github.com/open-s4c/tilt) | Lock interposition |
+| **schedkit** | [open-s4c/schedkit](https://github.com/open-s4c/schedkit) | User-space scheduler |
 | **libvsync** | [open-s4c/libvsync](https://github.com/open-s4c/libvsync) | Spinlock implementations (CAS, Ticket, MCS, TTAS, Hemlock) |
 | **pythainer** | [apaolillo/pythainer](https://github.com/apaolillo/pythainer) | Composable Docker builders |
 
@@ -260,7 +245,7 @@ sudo usermod -aG docker $USER
 synchronization primitives, including spinlock algorithms such as
 CAS, Ticket, MCS, TTAS, and Hemlock.
 In this artifact, libvsync provides the lock implementations that are injected
-into benchmarks via tilt (LD_PRELOAD) for the locking experiments (Figures 7, 14).
+into benchmarks via tilt (LD_PRELOAD) for the locking experiments (Figures 3, 6).
 libvsync is included in the artifact as a git submodule and will be installed
 with the instructions below.
 
@@ -268,7 +253,7 @@ with the instructions below.
 
 [Pythainer](https://github.com/apaolillo/pythainer) is a Python library for
 programmable, composable Docker image building.
-It is used by perfaid to manage container-based experiments (Figure 15).
+It is used by benchkit to manage container-based experiments (Figure 7).
 Pythainer is included in the artifact as a git submodule and will be installed
 with the instructions below.
 
@@ -277,8 +262,8 @@ with the instructions below.
 ##### 1. Clone the repository
 
 ```bash
-git clone --recursive https://github.com/softwarelanguageslab/icpe26-perfaid-ae.git
-cd icpe26-perfaid-ae/
+git clone --recursive https://github.com/softwarelanguageslab/icpe26-benchkit-ae.git
+cd icpe26-benchkit-ae/
 ```
 
 #### 2. Set up Python environment
@@ -335,8 +320,8 @@ benchmark_<hostname>_<campaign_name>_<timestamp>/
 Example:
 
 ```
-benchmark_proton_fig04_taskset_placement_20260127_192431_194508.csv
-benchmark_proton_fig04_taskset_placement_20260127_192431_194508/
+benchmark_proton_listing4_placement_spec_20260127_192431_194508.csv
+benchmark_proton_listing4_placement_spec_20260127_192431_194508/
 ```
 
 The directory contains:
@@ -349,11 +334,11 @@ The directory contains:
   * JSON results,
   * profiler outputs
 
-For example, a flame-graph campaign (Figures 13 and 14) produces the following
+For example, a flame-graph campaign (Listing 9 and Figure 6) produces the following
 structure:
 
 ```
-benchmark_vm_fig13_leveldb_flamegraph_20260128_205003_953967
+benchmark_vm_figure6_leveldb_flamegraph_20260128_205003_953967
 ├── benchkit-20260128-205034-01.pdf
 ├── benchkit-20260128-205034-01.png
 ├── commands.sh
@@ -398,7 +383,7 @@ and the raw profiler traces they were derived from**, supporting independent val
 and post-processing. Each "recorded configuration" has its own leaf directory
 in the hierarchy, allowing for easy comparison across experiments.
 
-**We strongly encourage reviewers to explore this directory** — it is designed
+**We strongly encourage reviewers to explore this directory**: it is designed
 to make experiments transparent and inspectable.
 
 To find your latest results after running a campaign:
@@ -436,7 +421,7 @@ without requiring any internal instrumentation or logging format.
 During execution, benchkit provides **live progress information** in the console
 output, including an estimate of the **remaining execution time** for long-running
 campaigns. This estimate is updated as runs complete and is especially useful for
-experiments that sweep large parameter spaces (e.g., Figures 7 and 10).
+experiments that sweep large parameter spaces (e.g., Figures 3 and 4).
 
 ---
 
@@ -449,16 +434,37 @@ Almost every script exposes two parameters that control execution time:
   (affects measurement stability)
 
 Reviewers who want to **quickly verify that a script runs correctly** can reduce
-these values (e.g., `nb_runs=1`, `duration_s=3`). This is especially useful for
-the long-running experiments (Figures 7 and 10). The parameters are defined as
-constants near the top of each script and are straightforward to edit.
+these values. The full experiments in `experiments/` accept them as command-line
+flags, e.g.:
+
+```bash
+python figure3_locks.py --nb-runs 1 --duration-s 3
+```
+
+This is especially useful for the long-running experiments (Figures 3 and 4).
+The defaults reproduce the paper's values; run any experiment with `--help` to see
+all available flags. The `examples/` listings instead pass these parameters directly
+in the campaign constructor (edit the value in the script to change them).
 
 > **Trade-off**: Reducing `nb_runs` increases variance in the plotted results;
 > reducing `duration_s` may cause short-lived benchmarks to be dominated by
 > startup overhead rather than steady-state behavior. The default values used
 > in the scripts are those that produced the paper's figures. For a quick
-> smoke test, `nb_runs=1` and `duration_s=5` are reasonable choices that still
+> smoke test, `--nb-runs 1 --duration-s 5` are reasonable choices that still
 > produce meaningful (if noisier) plots.
+
+---
+
+### Regenerating the paper figures
+
+Each `experiments/` script produces its **paper-styled** figure automatically at
+the end of the run (via `lib/plots.py`), saved as a PDF in
+`~/.benchkit/results/`. The figures use standard fonts by default so they render
+without a LaTeX toolchain; pass `--paper-fonts` for the exact paper typography:
+
+```bash
+python figure3_locks.py --paper-fonts
+```
 
 ---
 
@@ -466,57 +472,57 @@ constants near the top of each script and are straightforward to edit.
 
 These scripts are runnable versions of the **code listings** in the paper.
 They are designed to run quickly on any Linux machine and illustrate specific
-perfaid features. All examples are self-contained and require only the basic
+benchkit features. All examples are self-contained and require only the basic
 system packages listed above (no NUMA server, no Docker).
 
 Each example script contains a detailed docstring with paper references,
 expected timing, hardware context, prerequisites, and output description.
 
-| Script | Paper Figure | What it demonstrates | Est. time |
+| Script | Paper Listing | What it demonstrates | Est. time |
 |--------|-------------|----------------------|-----------|
-| `fig01_leveldb.py` | Fig. 1 | Basic campaign (benchmark + parameter space + plot) | ~5 min |
-| `fig02_spec.py` | Fig. 2 | SPEC baseline variability under default scheduling (requires license) | ~5-30 min |
-| `fig03_heater.py` | Fig. 3 | Per-CPU sequential heater sweep | ~3 min (24 cores) |
-| `fig04_leveldb_placement.py` | Fig. 4 | TasksetWrap for CPU placement (LevelDB) | ~20 min |
-| `fig04_spec_placement.py` | Fig. 4 | TasksetWrap for CPU placement (SPEC CPU 2017, requires license) | ~5-120 min |
-| `fig06_leveldb_locks.py` | Fig. 6 | Lock interposition via Tilt (LD_PRELOAD) | ~15 min |
-| `fig08_sched_hooks.py` | Fig. 8 | Scheduler hook mechanism (illustrative, no benchmark run) | instant |
-| `fig09_leveldb_schedulers.py` | Fig. 9 | Scheduler sweep with pre/post-run hooks | ~15 min |
-| `fig11_leveldb_perfstat.py` | Fig. 11 | perf stat + scheduling policies | ~10 min |
-| `fig13_leveldb_flamegraph.py` | Fig. 13 | Flame graph and differential flame graph generation | ~2 min |
+| `listing1_leveldb.py` | Listing 1 | Basic campaign (benchmark + parameter space + plot) | ~5 min |
+| `listing2_spec.py` | Listing 2 | SPEC baseline variability under default scheduling (requires license) | ~5-30 min |
+| `listing3_heater.py` | Listing 3 | Per-CPU sequential heater sweep | ~3 min (24 threads) |
+| `listing4_spec_placement.py` | Listing 4 | TasksetWrap for CPU placement (SPEC CPU 2017, requires license) | ~5-120 min |
+| `listing4_leveldb_placement.py` | Listing 4 | TasksetWrap for CPU placement (LevelDB) | ~20 min |
+| `listing5_leveldb_locks.py` | Listing 5 | Lock interposition via tilt (LD_PRELOAD) | ~15 min |
+| `listing6_sched_hooks.py` | Listing 6 | Scheduler hook mechanism (illustrative, no benchmark run) | instant |
+| `listing7_leveldb_schedulers.py` | Listing 7 | Scheduler sweep with pre/post-run hooks | ~15 min |
+| `listing8_leveldb_perfstat.py` | Listing 8 | perf stat + scheduling policies | ~10 min |
+| `listing9_leveldb_flamegraph.py` | Listing 9 | Flame graph and differential flame graph generation | ~2 min |
 
 ```bash
 cd examples/
 
-# Figure 1: Basic LevelDB campaign
-python fig01_leveldb.py
+# Listing 1: Basic LevelDB campaign
+python listing1_leveldb.py
 
-# Figure 2: SPEC baseline variability (requires license, only on x86)
-python fig02_spec.py /path/to/cpu2017-1.1.9.iso
+# Listing 2: SPEC baseline variability (requires license, only on x86)
+python listing2_spec.py /path/to/cpu2017-1.1.9.iso
 
-# Figure 3: Sequential heater (per-CPU characterization)
-python fig03_heater.py
+# Listing 3: Sequential heater (per-CPU characterization)
+python listing3_heater.py
 
-# Figure 4: TasksetWrap for CPU placement (LevelDB variant)
-python fig04_leveldb_placement.py
+# Listing 4: TasksetWrap for CPU placement (SPEC CPU 2017, requires license, only on x86)
+python listing4_spec_placement.py /path/to/cpu2017-1.1.9.iso
 
-# Figure 4: TasksetWrap for CPU placement (SPEC CPU 2017, requires license, only on x86)
-python fig04_spec_placement.py /path/to/cpu2017-1.1.9.iso
+# Listing 4: TasksetWrap for CPU placement (LevelDB variant)
+python listing4_leveldb_placement.py
 
-# Figure 6: Lock campaign with Tilt
-python fig06_leveldb_locks.py
+# Listing 5: Lock campaign with tilt
+python listing5_leveldb_locks.py
 
-# Figure 8: Scheduler hook demo (no benchmark run)
-python fig08_sched_hooks.py
+# Listing 6: Scheduler hook demo (no benchmark run)
+python listing6_sched_hooks.py
 
-# Figure 9: Scheduler campaign
-python fig09_leveldb_schedulers.py
+# Listing 7: Scheduler campaign
+python listing7_leveldb_schedulers.py
 
-# Figure 11: perf-stat integration
-python fig11_leveldb_perfstat.py
+# Listing 8: perf-stat integration
+python listing8_leveldb_perfstat.py
 
-# Figure 13: Flame graph generation
-python fig13_leveldb_flamegraph.py
+# Listing 9: Flame graph generation
+python listing9_leveldb_flamegraph.py
 ```
 
 ---
@@ -528,12 +534,12 @@ Below is a detailed tutorial for each figure.
 
 ---
 
-#### Figure 5: Hybrid-Core Variability Analysis
+#### Figure 2: Hybrid-Core Variability Analysis
 
 **Paper reference**: Section 3 (Drilldown Case Study on Hybrid-Core Variability)
 
 **Hardware used in the paper**: Platform A — hybrid-core laptop
-(AMD Ryzen AI 9 HX 370, 8 P-cores + 16 E-cores, 24 total, 32 GiB RAM).
+(AMD Ryzen AI 9 HX 370, 4 P-cores + 8 E-cores, 12 cores / 24 threads, 32 GiB RAM).
 
 **What it produces**: A two-panel figure showing (left) runtime/throughput
 variability under different CPU placements and (right) per-CPU throughput
@@ -543,9 +549,9 @@ from the sequential heater.
 
 | Step | Script | What it does | Est. time |
 |------|--------|-------------|-----------|
-| 1 | `fig05_heater.py` | Per-CPU heater sweep to identify P/E cores (Fig. 5 right) | ~3 min |
-| 2 | `fig05_placement_spec.py` | Placement experiment with SPEC CPU 2017 (Fig. 5 left, requires license) | ~5-120 min |
-| 2 (alt.) | `fig05_placement_leveldb.py` | Open-source alternative using LevelDB (same methodology, no license needed) | ~5 min |
+| 1 | `figure2_heater.py` | Per-CPU heater sweep to identify P/E cores (Fig. 2 right) | ~3 min |
+| 2 | `figure2_placement_spec.py` | Placement experiment with SPEC CPU 2017 (Fig. 2 left, requires license) | ~5-120 min |
+| 2 (alt.) | `figure2_placement_leveldb.py` | Open-source alternative using LevelDB (same methodology, no license needed) | ~5 min |
 
 **Procedure**:
 
@@ -553,32 +559,32 @@ from the sequential heater.
 cd experiments/
 
 # Step 1: Characterize your CPUs (identify P vs E cores)
-python fig05_heater.py
+python figure2_heater.py
 # -> Inspect the bar plot to determine which cores are fast (P) vs slow (E)
 
 # Step 2: SPEC placement experiment (as used in the paper, requires license)
-# Edit P_CORES and E_CORES in fig05_placement_spec.py based on Step 1
-python fig05_placement_spec.py /path/to/cpu2017-1.1.9.iso
+# Edit P_CORES and E_CORES in figure2_placement_spec.py based on Step 1
+python figure2_placement_spec.py /path/to/cpu2017-1.1.9.iso
 
 # Step 2 (alternative): Open-source placement experiment (LevelDB, no license needed)
-# Edit P_CORES and E_CORES in fig05_placement_leveldb.py based on Step 1
-python fig05_placement_leveldb.py
+# Edit P_CORES and E_CORES in figure2_placement_leveldb.py based on Step 1
+python figure2_placement_leveldb.py
 ```
 
 **Notes**:
-- The paper uses **SPEC CPU 2017** for Figure 5 (left). If you have a SPEC
-  license, use `fig05_placement_spec.py` to reproduce the exact experiment.
-- If you do not have a SPEC license, `fig05_placement_leveldb.py` demonstrates
-  the same perfaid features and methodology using LevelDB as a drop-in
+- The paper uses **SPEC CPU 2017** for Figure 2 (left). If you have a SPEC
+  license, use `figure2_placement_spec.py` to reproduce the exact experiment.
+- If you do not have a SPEC license, `figure2_placement_leveldb.py` demonstrates
+  the same benchkit features and methodology using LevelDB as a drop-in
   replacement.
 - On **homogeneous** machines (no P/E asymmetry), all three placement conditions
   will produce similar results — this is expected.
 
 ---
 
-#### Figure 7: Lock Throughput Study (5-panel)
+#### Figure 3: Lock Throughput Study (5-panel)
 
-**Paper reference**: Section 4.1 (Studying Locking Impact with perfaid)
+**Paper reference**: Section 4.1 (Studying Locking Impact)
 
 **Hardware used in the paper**: Platform B — NUMA server
 (2x Kunpeng 920-4826, 96 cores, 4 NUMA nodes, 539 GiB RAM, aarch64).
@@ -587,53 +593,56 @@ python fig05_placement_leveldb.py
 for 8 lock implementations across KyotoCabinet, LevelDB/readrandom,
 LevelDB/seekrandom, RocksDB/readrandom, and RocksDB/seekrandom.
 
-**Expected execution time**: ~96 minutes on the paper's 96-core server
-(measured: `real 95m40s`). Thread counts are automatically filtered to
-available CPUs, so it runs faster on smaller machines.
+**Expected execution time**: with the default paper parameters (`nb_runs=3`,
+`duration_s=10`), several hours on the paper's 96-core server; a reduced run
+(`--nb-runs 2 --duration-s 5`) took ~96 minutes (measured: `real 95m40s`).
+Thread counts are automatically filtered to available CPUs, so it runs faster
+on smaller machines.
 
 **Procedure**:
 
 ```bash
 cd experiments/
-python fig07_locks.py
+python figure3_locks.py
 ```
 
 **Notes**:
-- The Tilt shared library (lock interposition) is built automatically.
+- The tilt shared library (lock interposition) is built automatically.
 - On non-NUMA machines, the NUMA-aware locks (CNA, HMCS) may not show the
   performance advantages reported in the paper.
 - RocksDB requires additional system packages: `libgflags-dev liblz4-dev libzstd-dev zlib1g-dev`.
 
 ---
 
-#### Figure 10: Scheduler Throughput Study (5-panel)
+#### Figure 4: Scheduler Throughput Study (5-panel)
 
-**Paper reference**: Section 4.2 (Studying Thread-Placement Impact with perfaid)
+**Paper reference**: Section 4.2 (Studying Thread-Placement Impact)
 
 **Hardware used in the paper**: Platform B — NUMA server
 (2x Kunpeng 920-4826, 96 cores, 4 NUMA nodes, 539 GiB RAM, aarch64).
 
 **What it produces**: A 5-panel line plot showing throughput vs. thread count
-for 6 scheduling policies across the same benchmarks as Figure 7.
+for 6 scheduling policies across the same benchmarks as Figure 3.
 
-**Expected execution time**: ~96 minutes on the paper's 96-core server
-(measured: `real 95m26s`).
+**Expected execution time**: with the default paper parameters (`nb_runs=3`,
+`duration_s=10`), several hours on the paper's 96-core server; a reduced run
+(`--nb-runs 2 --duration-s 5`) took ~96 minutes (measured: `real 95m26s`).
 
 **Procedure**:
 
 ```bash
 cd experiments/
-python fig10_schedulers.py
+python figure4_schedulers.py
 ```
 
 **Notes**:
-- The schedkit daemon (UserPlace) is built and managed automatically via pre/post-run hooks.
+- The schedkit daemon is built and managed automatically via pre/post-run hooks.
 - On non-NUMA machines, NUMA-aware policies (CLOSE, FAR, etc.) may not produce
   meaningful differences.
 
 ---
 
-#### Figure 12: perf-stat Analysis with Schedulers (5-panel)
+#### Figure 5: perf-stat Analysis with Schedulers (5-panel)
 
 **Paper reference**: Section 4.3 (Using perf for Profiling and Run-Time Statistics)
 
@@ -651,14 +660,14 @@ under 6 scheduling policies.
 
 ```bash
 cd experiments/
-python fig12_leveldb_perfstat.py
+python figure5_leveldb_perfstat.py
 ```
 
 ---
 
-#### Figure 14: Differential Flame Graphs
+#### Figure 6: Differential Flame Graphs
 
-**Paper reference**: Section 4.4 (Visualizing Performance with Flame Graphs in perfaid)
+**Paper reference**: Section 4.4 (Visualizing Performance with Flame Graphs in benchkit)
 
 **Hardware used in the paper**: Platform B — NUMA server (2x Kunpeng 920-4826, 96 cores, aarch64).
 
@@ -675,7 +684,7 @@ in `pthread_mutex_lock` compared to MCS.
 
 ```bash
 cd experiments/
-python fig14_leveldb_flamegraph.py
+python figure6_leveldb_flamegraph.py
 ```
 
 **Output**: Look for `flamegraph.svg` files in per-run directories and
@@ -684,14 +693,14 @@ and stored" above).
 
 ---
 
-#### Figure 15: Framework Overhead
+#### Figure 7: Framework Overhead
 
-**Paper reference**: Section 5 (Overhead of perfaid)
+**Paper reference**: Section 5 (Overhead of benchkit)
 
 **Hardware used in the paper**: Intel Core i7-13800H laptop, Ubuntu 22.04.5, Linux 6.8.0.
 
 **What it produces**: A 3-panel strip plot (one per thread count: 2, 4, 8)
-comparing throughput of perfaid vs. hand-written shell scripts, on host and
+comparing throughput of benchkit vs. hand-written shell scripts, on host and
 inside Docker. The paper shows <2.2% overhead on host and <0.7% inside Docker.
 
 **Expected execution time**: ~20 minutes total (broken down below).
@@ -701,12 +710,12 @@ inside Docker. The paper shows <2.2% overhead on host and <0.7% inside Docker.
 **Procedure** (4 steps, must be run in order):
 
 ```bash
-cd experiments/fig15_overhead/
+cd experiments/figure7_overhead/
 
 # Step 1: Run benchkit campaigns (host + Docker)
 # This also builds the Docker image and clones LevelDB.
 # Est. time: ~12 minutes (image build + 2 campaigns)
-python fig15_leveldb_overhead.py
+python figure7_leveldb_overhead.py
 
 # Step 2: Run the shell baseline on the host
 # Est. time: ~5 minutes
@@ -718,7 +727,7 @@ python fig15_leveldb_overhead.py
 
 # Step 4: Generate the final comparison figure
 python plot_overhead.py
-# -> Output: ~/.benchkit/results/fig15_overhead.{pdf,png}
+# -> Output: ~/.benchkit/results/figure7_overhead.{pdf,png}
 # -> Console: overhead summary table
 ```
 
@@ -734,14 +743,14 @@ python plot_overhead.py
 
 | Script | Figure | Section | Platform | Est. time | Needs |
 |--------|--------|---------|----------|-----------|-------|
-| `fig05_heater.py` | 5 (right) | 3.2 | A (laptop) | ~3 min | — |
-| `fig05_placement_spec.py` | 5 (left) | 3.1-3.3 | A (laptop) | 5-120 min | SPEC license |
-| `fig05_placement_leveldb.py` | 5 (left) | 3.3 | A (laptop) | ~5 min | — (alternative) |
-| `fig07_locks.py` | 7 | 4.1 | B (server) | ~96 min | — |
-| `fig10_schedulers.py` | 10 | 4.2 | B (server) | ~96 min | — |
-| `fig12_leveldb_perfstat.py` | 12 | 4.3 | B (server) | ~10 min | perf access |
-| `fig14_leveldb_flamegraph.py` | 14 | 4.4 | B (server) | ~1 min | perf access |
-| `fig15_overhead/` | 15 | 5 | A (laptop) | ~20 min | Docker |
+| `figure2_heater.py` | 2 (right) | 3.2 | A (laptop) | ~3 min | — |
+| `figure2_placement_spec.py` | 2 (left) | 3.1-3.3 | A (laptop) | 5-120 min | SPEC license |
+| `figure2_placement_leveldb.py` | 2 (left) | 3.3 | A (laptop) | ~5 min | — (alternative) |
+| `figure3_locks.py` | 3 | 4.1 | B (server) | ~5 h (96 min reduced) | — |
+| `figure4_schedulers.py` | 4 | 4.2 | B (server) | ~5 h (96 min reduced) | — |
+| `figure5_leveldb_perfstat.py` | 5 | 4.3 | B (server) | ~10 min | perf access |
+| `figure6_leveldb_flamegraph.py` | 6 | 4.4 | B (server) | ~1 min | perf access |
+| `figure7_overhead/` | 7 | 5 | Any Linux | ~20 min | Docker |
 
 ---
 
@@ -777,7 +786,7 @@ then re-fetch and rebuild all required benchmarks from scratch.
 
 ## Artifact badges
 
-This artifact is submitted for:
+This artifact obtained the following badges:
 
 * **Artifacts Available**: The artifact is hosted on a public GitHub
   repository with all source code, scripts, and documentation. In addition,

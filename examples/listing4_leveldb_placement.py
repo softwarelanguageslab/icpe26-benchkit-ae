@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 4: perfaid campaign using TasksetWrap to enforce core placement (LevelDB).
+Listing 4 (variant): benchkit campaign using TasksetWrap to enforce core placement (LevelDB).
 
 Paper reference:
-    Section 3.3 (Controlled Placement with taskset), Figure 4.
+    Section 3.3 (Controlled Placement with taskset), Listing 4 (open-source variant).
 
 What this script does:
     Demonstrates how to use the TasksetWrap command wrapper to control CPU
@@ -16,12 +16,12 @@ What this script does:
       - E-Cores: pinned to efficiency cores only
 
     This is the open-source (LevelDB) variant of the placement experiment.
-    For the SPEC CPU 2017 variant shown in the paper, see fig04_spec_placement.py.
+    For the SPEC CPU 2017 variant shown in the paper, see listing4_spec_placement.py.
 
 Hardware used in the paper:
-    Platform A - hybrid-core laptop (AMD Ryzen AI 9 HX 370, 24 cores).
+    Platform A - hybrid-core laptop (AMD Ryzen AI 9 HX 370, 12 cores, 24 threads).
     The P_CORES and E_CORES lists below must be adjusted for your hardware.
-    Run fig03_heater.py first to identify which cores are fast (P) vs. slow (E).
+    Run listing3_heater.py first to identify which cores are fast (P) vs. slow (E).
     On a homogeneous machine, all three conditions will yield similar results.
 
 Expected execution time:
@@ -34,7 +34,7 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig04_leveldb_placement.py
+    python listing4_leveldb_placement.py
 
 Output:
     - CSV results and a strip-plot (PNG/PDF) in ~/.benchkit/results/
@@ -47,14 +47,14 @@ from benchkit.commandwrappers.taskset import TasksetWrap
 
 # CPU configuration for AMD Ryzen AI 9 HX 370
 # Adjust these for your specific hybrid-core processor.
-# Use fig03_heater.py to identify P-cores (high throughput) vs E-cores (lower throughput).
+# Use listing3_heater.py to identify P-cores (high throughput) vs E-cores (lower throughput).
 P_CORES = [0, 1, 2, 3, 12, 13, 14, 15]
 E_CORES = [4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 21, 22, 23]
 
 
 def main() -> None:
     campaign = CampaignCartesianProduct(
-        name="fig04_placement_leveldb",
+        name="listing4_placement_leveldb",
         benchmark=LevelDBBench(),
         variables={
             "bench_name": ["readrandom"],

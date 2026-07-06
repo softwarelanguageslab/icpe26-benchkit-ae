@@ -2,14 +2,14 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 9: perfaid campaign for LevelDB with different scheduling policies.
+Listing 7: benchkit campaign for LevelDB with different scheduling policies.
 
 Paper reference:
-    Section 4.2 (Studying Thread-Placement Impact with perfaid), Figure 9.
+    Section 4.2 (Studying Thread-Placement Impact), Listing 7.
 
 What this script does:
     Demonstrates how to compose scheduling policies with benchmarks using
-    pre/post run hooks. Before each run, the UserPlace daemon (schedkit)
+    pre/post run hooks. Before each run, the schedkit daemon
     is started with the policy drawn from the parameter space; after each
     run it is stopped. Six policies are compared: Normal (default Linux),
     FAR, CLOSE, AsymSched, SAM, and SAS.
@@ -29,7 +29,7 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig09_leveldb_schedulers.py
+    python listing7_leveldb_schedulers.py
 
 Output:
     - CSV results and a line-plot (PNG/PDF) in ~/.benchkit/results/
@@ -47,7 +47,7 @@ def main() -> None:
     schedkit = get_scheduler(platform=platform)
 
     campaign = CampaignCartesianProduct(
-        name="fig09_leveldb_schedulers",
+        name="listing7_leveldb_schedulers",
         benchmark=LevelDBBench(),
         pre_run_hooks=[schedkit.start_sched_hook],
         post_run_hooks=[schedkit.end_sched_hook],

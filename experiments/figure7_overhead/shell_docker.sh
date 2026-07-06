@@ -2,27 +2,27 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-# Figure 15: Shell-based overhead measurement (Docker execution)
+# Figure 7: Shell-based overhead measurement (Docker execution)
 #
-# Paper reference: Section 5 (Overhead of perfaid), Figure 15.
+# Paper reference: Section 5 (Overhead of benchkit), Figure 7.
 #
-# This script is the hand-written shell equivalent of the perfaid campaign
+# This script is the hand-written shell equivalent of the benchkit campaign
 # running inside a Docker container. It performs the same steps as shell_host.sh
-# but executes all commands inside the perfaid_overhead Docker image:
+# but executes all commands inside the benchkit_overhead Docker image:
 #   1. Builds db_bench inside the container
 #   2. Runs fillseq once to initialize the database
 #   3. Runs readrandom for threads in {2, 4, 8}, 10 repetitions each
-#   4. Saves raw output to ~/.benchkit/results/fig15_shell_docker/
+#   4. Saves raw output to ~/.benchkit/results/figure7_shell_docker/
 #
 # Prerequisites:
-#   - Run fig15_leveldb_overhead.py first (it builds the Docker image and
+#   - Run figure7_leveldb_overhead.py first (it builds the Docker image and
 #     clones LevelDB into ~/.benchkit/benches/)
 #   - Docker installed and current user in docker group
 #
 # Expected execution time: ~5 minutes (3 thread counts x 10 runs x 10 s)
 #
 # How to run:
-#   cd experiments/fig15_overhead/
+#   cd experiments/figure7_overhead/
 #   ./shell_docker.sh
 #
 # After running, use plot_overhead.py to generate the comparison figure.
@@ -32,7 +32,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-IMAGE_NAME="perfaid_overhead"
+IMAGE_NAME="benchkit_overhead"
 NB_RUNS=10
 DURATION=10
 
@@ -50,7 +50,7 @@ BUILD_DIR_CONT="$LEVELDB_SRC_CONT/build-shelldocker"
 DB_DIR_CONT="$BUILD_DIR_CONT/tmp/shell_leveldb_db"
 
 # Output directory on host
-OUT_DIR="$BENCHKIT_HOME_HOST/results/fig15_shell_docker"
+OUT_DIR="$BENCHKIT_HOME_HOST/results/figure7_shell_docker"
 
 mkdir -p "$OUT_DIR"
 
@@ -67,7 +67,7 @@ run_in_docker() {
   docker run --rm --tty --interactive \
     --volume="$REPO_DIR":"/home/user/workspace" \
     --volume="$BENCHKIT_HOME_HOST":"$BENCHKIT_HOME_CONT" \
-    --hostname=perfaid_overhead \
+    --hostname=benchkit_overhead \
     --user=1000:1000 \
     "$IMAGE_NAME" \
     bash --login -c "$1"

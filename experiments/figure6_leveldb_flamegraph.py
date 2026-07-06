@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 14 Experiment: Differential flame graphs for CAS vs MCS locks.
+Figure 6 Experiment: Differential flame graphs for CAS vs MCS locks.
 
 Paper reference:
-    Section 4.4 (Visualizing Performance with Flame Graphs in perfaid), Figure 14.
+    Section 4.4 (Visualizing Performance with Flame Graphs in benchkit), Figure 6.
 
 What this script does:
     Runs LevelDB readrandom at 32 threads under two lock implementations
@@ -34,7 +34,7 @@ Prerequisites:
 
 How to run:
     cd experiments/
-    python fig14_leveldb_flamegraph.py
+    python figure6_leveldb_flamegraph.py
 
 Output:
     - Per-run flame graphs (flamegraph.svg) in per-run directories
@@ -42,9 +42,11 @@ Output:
     - All stored under ~/.benchkit/results/
 """
 
+import argparse
+
 from benchkit import CampaignCartesianProduct
 from benchkit.benches.leveldb import LevelDBBench
-from benchkit.commandwrappers.perf import PerfReportWrap, enable_non_sudo_perf
+from benchkit.commandwrappers.perf import PerfRecordWrap, enable_non_sudo_perf
 from benchkit.utils.dir import get_tools_dir
 
 from lib import (
@@ -54,16 +56,29 @@ from lib import (
     get_scheduler,
     get_tilt_lib,
 )
+from lib.plots import (
+    barplot_by_category,
+    flamegraph_svg_to_pdf,
+    load_campaign_df,
+    set_paper_style,
+)
 
-# Experiment configuration
-NB_THREADS = 32
-DURATION_S = 10
+# Experiment configuration (fixed comparison: CAS vs MCS under CLOSE)
 SCHEDULER = "CLOSE"
 LOCKS = ["caslock", "mcslock"]
 BENCH_NAME = "readrandom"
 
+# ---- User-tunable defaults (paper values) ----
+DEFAULT_NB_THREADS = 32
+DEFAULT_DURATION_S = 10
 
-def main() -> None:
+
+def run(
+    *,
+    nb_threads: int = DEFAULT_NB_THREADS,
+    duration_s: int = DEFAULT_DURATION_S,
+    paper_fonts: bool = False,
+) -> None:
     platform = get_platform()
     enable_non_sudo_perf(comm_layer=platform.comm)
 
@@ -72,7 +87,7 @@ def main() -> None:
 
     # Configure perf record
     flamegraph_dir = get_tools_dir(None) / "FlameGraph"
-    perf_record = PerfReportWrap(
+    perf_record = PerfRecordWrap(
         freq=99,
         report_interactive=False,
         report_file=True,
@@ -83,17 +98,17 @@ def main() -> None:
     perf_record.fetch_flamegraph()
 
     campaign = CampaignCartesianProduct(
-        name="fig14_leveldb_flamegraph",
+        name="figure6_leveldb_flamegraph",
         benchmark=LevelDBBench(),
         shared_libs=[tiltlib],
         variables={
-            "nb_threads": [NB_THREADS],
+            "nb_threads": [nb_threads],
             "bench_name": [BENCH_NAME],
             "scheduler": [SCHEDULER],
             "lock": LOCKS,
         },
         nb_runs=1,
-        duration_s=DURATION_S,
+        duration_s=duration_s,
         command_wrappers=[perf_record],
         pre_run_hooks=[schedkit.start_sched_hook],
         post_run_hooks=[
@@ -106,13 +121,15 @@ def main() -> None:
 
     campaign.run()
 
-    # Quick sanity check
-    campaign.generate_graph(
-        plot_name="barplot",
+    # Paper-styled sanity bar chart of throughput by lock
+    set_paper_style(use_latex=paper_fonts)
+    df = load_campaign_df(campaign)
+    barplot_by_category(
+        df,
         x="lock",
         y="throughput",
-        hue="lock",
-        title=f"LevelDB {BENCH_NAME} - throughput by lock",
+        ylabel="Throughput",
+        out_path=campaign.base_data_dir() / "figure6_throughput.pdf",
     )
 
     # Generate differential flame graphs
@@ -126,7 +143,7 @@ def main() -> None:
         return
 
     src_folded, dst_folded = folded_paths[0], folded_paths[1]
-    subtitle = f" ({DURATION_S} sec., {NB_THREADS} threads, {SCHEDULER} scheduler)"
+    subtitle = f" ({duration_s} sec., {nb_threads} threads, {SCHEDULER} scheduler)"
 
     # Differential: CAS vs MCS (red = more time in CAS)
     generate_differential_flamegraph(
@@ -146,10 +163,41 @@ def main() -> None:
         flamegraph_subtitle="MCS lock against CAS lock" + subtitle,
     )
 
+    # Convert the differential flame graphs to paper PDFs (Figure 6)
+    for svg_name in ("diff_cas_vs_mcs.svg", "diff_mcs_vs_cas.svg"):
+        svg_path = results_path / svg_name
+        if svg_path.exists():
+            flamegraph_svg_to_pdf(svg_path, svg_path.with_suffix(".pdf"))
+
     print(f"\nResults directory: {results_path}")
     print("\nGenerated flame graphs:")
     for svg in sorted(results_path.rglob("*.svg")):
         print(f"  {svg}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Figure 6: differential flame graphs for CAS vs MCS locks.",
+    )
+    parser.add_argument(
+        "--nb-threads",
+        type=int,
+        default=DEFAULT_NB_THREADS,
+        help=f"Number of benchmark threads (default: {DEFAULT_NB_THREADS}).",
+    )
+    parser.add_argument(
+        "--duration-s",
+        type=int,
+        default=DEFAULT_DURATION_S,
+        help=f"Duration in seconds per profiled run (default: {DEFAULT_DURATION_S}).",
+    )
+    parser.add_argument(
+        "--paper-fonts",
+        action="store_true",
+        help="Use LaTeX fonts for exact paper typography (requires a LaTeX install).",
+    )
+    args = parser.parse_args()
+    run(nb_threads=args.nb_threads, duration_s=args.duration_s, paper_fonts=args.paper_fonts)
 
 
 if __name__ == "__main__":

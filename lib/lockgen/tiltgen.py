@@ -2,11 +2,11 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Tilt-compatible C wrapper generation for libvsync spinlocks.
+tilt-compatible C wrapper generation for libvsync spinlocks.
 
-This module generates the C source files that allow Tilt (libmutrep) to
-interpose pthread_mutex calls with alternative spinlock implementations from
-the libvsync library (``deps/libvsync/``).
+This module generates the C source files that allow tilt to interpose
+pthread_mutex calls with alternative spinlock implementations from the
+libvsync library (``deps/libvsync/``).
 
 For each lock, the generator:
 1. Parses the lock's header file to determine its API shape:
@@ -20,8 +20,8 @@ For each lock, the generator:
 4. Writes the generated ``.c`` file to the output directory.
 
 The generated files are then compiled by the CMakeLists.txt in
-``generatedlocks/`` into individual shared libraries, which Tilt combines
-into the final ``libmutrep.so``.
+``generatedlocks/`` into individual shared libraries (one ``.so`` per lock),
+which tilt loads via LD_PRELOAD.
 
 Key functions:
     get_context_info()          Analyze a lock header and return its API properties.

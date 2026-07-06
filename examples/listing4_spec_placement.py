@@ -2,22 +2,22 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Figure 4: perfaid campaign using TasksetWrap to enforce core placement (SPEC CPU 2017).
+Listing 4: benchkit campaign using TasksetWrap to enforce core placement (SPEC CPU 2017).
 
 Paper reference:
-    Section 3.3 (Controlled Placement with taskset), Figure 4.
+    Section 3.3 (Controlled Placement with taskset), Listing 4.
 
 What this script does:
-    Same placement experiment as fig04_leveldb_placement.py but uses the
+    Same placement experiment as listing4_leveldb_placement.py but uses the
     SPEC CPU 2017 500.perlbench benchmark. Three placement conditions are
     compared: No Pinning, P-Cores only, E-Cores only.
 
     IMPORTANT: Requires a valid SPEC CPU 2017 license and ISO image.
-    For an open-source alternative, use fig04_leveldb_placement.py instead.
+    For an open-source alternative, use listing4_leveldb_placement.py instead.
 
 Hardware used in the paper:
-    Platform A - hybrid-core laptop (AMD Ryzen AI 9 HX 370, 24 cores).
-    Adjust P_CORES / E_CORES for your hardware (use fig03_heater.py to identify).
+    Platform A - hybrid-core laptop (AMD Ryzen AI 9 HX 370, 12 cores, 24 threads).
+    Adjust P_CORES / E_CORES for your hardware (use listing3_heater.py to identify).
 
 Expected execution time:
     ~5-10 minutes with size="test", ~90-120 minutes with size="ref".
@@ -30,12 +30,13 @@ Prerequisites:
 
 How to run:
     cd examples/
-    python fig04_spec_placement.py /path/to/cpu2017-1.1.9.iso
+    python listing4_spec_placement.py /path/to/cpu2017-1.1.9.iso
 
 Output:
     - CSV results and a strip-plot (PNG/PDF) in ~/.benchkit/results/
     - Strip plot shows runtime variability across placements
 """
+
 import argparse
 import sys
 from pathlib import Path
@@ -46,14 +47,14 @@ from benchkit.commandwrappers.taskset import TasksetWrap
 
 # CPU configuration for AMD Ryzen AI 9 HX 370
 # Adjust these for your specific hybrid-core processor.
-# Use fig03_heater.py to identify P-cores (high throughput) vs E-cores (lower throughput).
+# Use listing3_heater.py to identify P-cores (high throughput) vs E-cores (lower throughput).
 P_CORES = [0, 1, 2, 3, 12, 13, 14, 15]
 E_CORES = [4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 21, 22, 23]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Figure 4: SPEC CPU 2017 placement experiment with TasksetWrap.",
+        description="Listing 4: SPEC CPU 2017 placement experiment with TasksetWrap.",
     )
     parser.add_argument(
         "spec_iso",
@@ -68,7 +69,7 @@ def main() -> None:
         sys.exit(1)
 
     campaign = CampaignCartesianProduct(
-        name="fig04_placement_spec",
+        name="listing4_placement_spec",
         benchmark=SPECCPU2017Bench(),
         variables={
             "spec_source_iso": [spec_iso],

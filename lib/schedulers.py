@@ -1,10 +1,10 @@
 # Copyright (C) 2024 Vrije Universiteit Brussel. All rights reserved.
 # SPDX-License-Identifier: MIT
 """
-Scheduler (UserPlace / schedkit) integration for benchkit campaigns.
+Scheduler (schedkit) integration for benchkit campaigns.
 
 Paper reference:
-    Section 4.2 (Studying Thread-Placement Impact with perfaid), Figures 8-10.
+    Section 4.2 (Studying Thread-Placement Impact), Listings 6-7 and Figure 4.
 
 This module wraps the schedkit daemon (``deps/schedkit/``), a user-space
 scheduler that dynamically adjusts thread CPU affinities during benchmark
@@ -74,7 +74,7 @@ PRETTY_SCHEDULERS = {
 
 class SchedProcess:
     """
-    Manages the schedkit (UserPlace) scheduling daemon.
+    Manages the schedkit scheduling daemon.
 
     This class provides pre-run and post-run hooks that can be used in
     benchkit campaigns to control thread placement policies.
