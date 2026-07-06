@@ -268,6 +268,12 @@ cd icpe26-benchkit-ae/
 
 #### 2. Set up Python environment
 
+> **Python version:** use **Python 3.10-3.12** (3.12 is the reference version).
+> **Python 3.14 is not supported** -- it triggers a `RecursionError` in
+> seaborn/matplotlib during plot generation. If your system `python3` is 3.13+,
+> create the virtualenv with an explicit 3.12 interpreter, e.g.
+> `python3.12 -m venv .venv`.
+
 ```bash
 # Create and activate virtual environment
 python3 -m venv .venv
